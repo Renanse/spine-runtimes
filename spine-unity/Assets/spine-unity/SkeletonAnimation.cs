@@ -42,7 +42,8 @@ public class SkeletonAnimation : SkeletonRenderer {
 	public Spine.AnimationState state;
 
 	public delegate void UpdateBonesDelegate (SkeletonAnimation skeleton);
-
+    
+    public UpdateBonesDelegate UpdateState;
 	public UpdateBonesDelegate UpdateLocal;
 	public UpdateBonesDelegate UpdateWorld;
 	public UpdateBonesDelegate UpdateComplete;
@@ -59,10 +60,10 @@ public class SkeletonAnimation : SkeletonRenderer {
 			if (_animationName == value)
 				return;
 			_animationName = value;
-			if (value == null || value.Length == 0)
-				state.ClearTrack(0);
-			else
-				state.SetAnimation(0, value, loop);
+			if (string.IsNullOrEmpty(value))
+                state.ClearTrack(0);
+            else
+                state.SetAnimation(0, value, loop);
 		}
 	}
 
@@ -89,6 +90,10 @@ public class SkeletonAnimation : SkeletonRenderer {
 		deltaTime *= timeScale;
 		skeleton.Update(deltaTime);
 		state.Update(deltaTime);
+
+        if (UpdateState != null)
+            UpdateState(this);
+
 		state.Apply(skeleton);
 
 		if (UpdateLocal != null) 
